@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoTracker | ติดตามราคา Cryptocurrency แบบเรียลไทม์</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <h1>CryptoTracker</h1>
+            </div>
+            <div class="theme-toggle">
+                <i class="fas fa-moon"></i>
+            </div>
+        </header>
+
+        <!-- Global Market Info -->
+        <section class="market-info">
+            <div class="market-item">
+                <span class="label">มูลค่าตลาดทั้งหมด</span>
+                <span class="value" id="total-market-cap">กำลังโหลด...</span>
+            </div>
+            <div class="market-item">
+                <span class="label">ปริมาณการซื้อขาย 24h</span>
+                <span class="value" id="total-volume">กำลังโหลด...</span>
+            </div>
+            <div class="market-item">
+                <span class="label">BTC Dominance</span>
+                <span class="value" id="btc-dominance">กำลังโหลด...</span>
+            </div>
+        </section>
+
+        <!-- Search and Filters -->
+        <section class="controls">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search" placeholder="ค้นหา Cryptocurrency...">
+            </div>
+            <div class="currency-selector">
+                <select id="currency">
+                    <option value="usd">USD</option>
+                    <option value="thb">THB</option>
+                    <option value="eur">EUR</option>
+                </select>
+            </div>
+        </section>
+
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab active" data-tab="trending">ยอดนิยม</button>
+            <button class="tab" data-tab="all">ทั้งหมด</button>
+            <button class="tab" data-tab="favorites"><i class="fas fa-star"></i> รายการโปรด</button>
+        </div>
+
+        <!-- Crypto Table -->
+        <div class="table-container">
+            <table class="crypto-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>เหรียญ</th>
+                        <th>ราคา</th>
+                        <th>24h %</th>
+                        <th>7d %</th>
+                        <th>มูลค่าตลาด</th>
+                        <th>ปริมาณ (24h)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="crypto-data">
+                    <!-- Loading placeholder -->
+                    <tr class="loading-row">
+                        <td colspan="8">
+                            <div class="loading-container">
+                                <div class="loading-spinner"></div>
+                                <p>กำลังโหลดข้อมูล...</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination">
+            <button id="prev-page" disabled><i class="fas fa-angle-left"></i> ก่อนหน้า</button>
+            <span id="page-indicator">หน้า 1 จาก 5</span>
+            <button id="next-page">ถัดไป <i class="fas fa-angle-right"></i></button>
+        </div>
+
+        <!-- Crypto Detail Modal -->
+        <div id="crypto-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="coin-info">
+                        <img id="modal-coin-img" src="" alt="">
+                        <h2 id="modal-coin-name"></h2>
+                        <span id="modal-coin-symbol"></span>
+                    </div>
+                    <button class="close-modal"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="price-header">
+                    <div>
+                        <h3 id="modal-coin-price"></h3>
+                        <span id="modal-price-change" class="change"></span>
+                    </div>
+                    <button id="add-favorite" class="favorite-btn">
+                        <i class="far fa-star"></i> เพิ่มในรายการโปรด
+                    </button>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-controls">
+                        <div class="chart-period">
+                            <button class="period-btn active" data-period="1">24h</button>
+                            <button class="period-btn" data-period="7">7D</button>
+                            <button class="period-btn" data-period="30">30D</button>
+                            <button class="period-btn" data-period="90">90D</button>
+                            <button class="period-btn" data-period="365">1Y</button>
+                            <button class="period-btn" data-period="max">MAX</button>
+                        </div>
+                    </div>
+                    <canvas id="price-chart"></canvas>
+                </div>
+                
+                <div class="coin-stats">
+                    <div class="stat-group">
+                        <div class="stat-item">
+                            <span class="stat-label">มูลค่าตลาด</span>
+                            <span id="modal-market-cap" class="stat-value"></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">ปริมาณซื้อขาย 24h</span>
+                            <span id="modal-volume" class="stat-value"></span>
+                        </div>
+                    </div>
+                    <div class="stat-group">
+                        <div class="stat-item">
+                            <span class="stat-label">Circulating Supply</span>
+                            <span id="modal-circulating" class="stat-value"></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total Supply</span>
+                            <span id="modal-total-supply" class="stat-value"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="coin-description">
+                    <h3>เกี่ยวกับ <span id="about-coin-name"></span></h3>
+                    <p id="coin-description"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>ข้อมูลจาก <a href="https://www.coingecko.com/" target="_blank">CoinGecko API</a> | &copy; 2025 CryptoTracker</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.9.1/chart.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
